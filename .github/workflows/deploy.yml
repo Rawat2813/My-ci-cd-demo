@@ -3,7 +3,7 @@ name: Deploy Website to S3
 on:
   push:
     branches:
-      - main   # Trigger when code is pushed to main branch
+      - main
 
 jobs:
   deploy:
@@ -13,6 +13,15 @@ jobs:
       - name: Checkout latest code
         uses: actions/checkout@v4
 
+      - name: Show repo files (debug)
+        run: |
+          echo "=== show top-level files ==="
+          ls -la
+          echo "=== show .github/workflows ==="
+          ls -la .github || true
+          echo "=== find ci.html in repo ==="
+          find . -type f -name 'ci.html' -print || true
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -20,7 +29,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Upload single file to S3
+      - name: Find and upload ci.html to S3
+        shell: bash
         run: |
-          # upload the file website/ci.html to the S3 bucket root as ci.html
-          aws s3 cp website/ci.html s3://${{ secrets.S3_BUCKET }}/ci.html
+          # Find the first ci.html in the repo
+          FILE=$(find . -type f -name 'ci.html' -print -quit)
+          if [ -z "$FILE" ]; then
+            echo "ERROR: ci.html not found in repo. See previous step for repo listing."
+            exit 1
+          fi
+          echo "Found ci.html at: $FILE"
+          # Upload it to the bucket root as ci.html
+          aws s3 cp "$FILE" s3://${{ secrets.S3_BUCKET }}/ci.html
