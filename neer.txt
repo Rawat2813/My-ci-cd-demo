@@ -1,0 +1,6 @@
+1 try { . "c:\Users\neeraj.singh.rawat\AppData\Local\Programs\Microsoft VS Code\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegrat...
+   2 git clone https://github.com/Rawat2813/My-ci-cd-demo.git
+   3 ls
+   4 cd .\My-ci-cd-demo\
+   5 ls
+   6 history
